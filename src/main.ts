@@ -1,5 +1,7 @@
 import "./styles.css";
 import CanvasKitInit from "canvaskit-wasm";
+import { PixiSceneReader } from "./export/PixiSceneReader";
+import { SimpleVectorPdfExporter } from "./export/SimpleVectorPdfExporter";
 import { createPixiApp } from "./pixi/createPixiApp";
 import { addRandomShape } from "./scene/addRandomShape";
 import { createInitialScene } from "./scene/createInitialScene";
@@ -13,12 +15,15 @@ const statusTextElement =
   document.querySelector<HTMLParagraphElement>("#status-text");
 const addShapeButtonElement =
   document.querySelector<HTMLButtonElement>("#add-shape-button");
+const exportPdfButtonElement =
+  document.querySelector<HTMLButtonElement>("#export-pdf-button");
 
 if (
   !pixiHostElement ||
   !skiaCanvasElement ||
   !statusTextElement ||
-  !addShapeButtonElement
+  !addShapeButtonElement ||
+  !exportPdfButtonElement
 ) {
   throw new Error("Vectorloom Studio UI is missing required elements.");
 }
@@ -27,6 +32,7 @@ const pixiHost = pixiHostElement;
 const skiaCanvas = skiaCanvasElement;
 const statusText = statusTextElement;
 const addShapeButton = addShapeButtonElement;
+const exportPdfButton = exportPdfButtonElement;
 
 const app = createPixiApp();
 pixiHost.appendChild(app.view);
@@ -63,6 +69,24 @@ async function boot(): Promise<void> {
   });
 
   pointerBridge.bind();
+
+  const sceneReader = new PixiSceneReader();
+  const pdfExporter = new SimpleVectorPdfExporter();
+
+  exportPdfButton.disabled = false;
+  exportPdfButton.addEventListener("click", () => {
+    const pdfScene = sceneReader.read(scene);
+    const pdfBlob = pdfExporter.export(pdfScene);
+    const url = URL.createObjectURL(pdfBlob);
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "vectorloom-scene.pdf";
+    link.click();
+
+    URL.revokeObjectURL(url);
+    statusText.textContent = "Vector PDF exported from Pixi scene";
+  });
 
   renderSkiaPreview = () => {
     renderer.render(scene);
