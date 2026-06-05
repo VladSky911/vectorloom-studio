@@ -3,6 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Vectorloom Studio bridges PixiJS containers into Skia CanvasKit rendering and vector PDF export."
+    />
     <title>Vectorloom Studio</title>
   </head>
   <body>
@@ -12,7 +16,7 @@
           <span class="brand-mark"></span>
           <div>
             <h1>Vectorloom Studio</h1>
-            <p>Pixi scene. Skia render. Vector PDF export.</p>
+            <p>Pixi scene. Skia render. Vector PDF.</p>
           </div>
         </div>
 
@@ -25,26 +29,56 @@
         </section>
 
         <section class="panel">
+          <h2>Render Stack</h2>
+          <div class="status-list">
+            <div class="status-row">
+              <span class="status-dot is-ready"></span>
+              <span>PixiJS legacy canvas</span>
+            </div>
+            <div class="status-row">
+              <span class="status-dot is-ready"></span>
+              <span>Skia CanvasKit preview</span>
+            </div>
+            <div class="status-row">
+              <span id="pdf-backend-dot" class="status-dot"></span>
+              <span id="pdf-backend-label">PDF backend loading</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel">
           <h2>Status</h2>
           <p id="status-text">Starting renderer...</p>
         </section>
       </aside>
 
       <section class="workspace">
-        <div class="viewport">
-          <div class="viewport-header">
-            <h2>Pixi canvas</h2>
-            <span>forceCanvas=true</span>
+        <header class="workspace-title">
+          <div>
+            <h2>Scene Parity View</h2>
+            <p>
+              Interactive Pixi container on the left, Skia-rendered mirror on
+              the right.
+            </p>
           </div>
-          <div id="pixi-host" class="canvas-host"></div>
-        </div>
+        </header>
 
-        <div class="viewport">
-          <div class="viewport-header">
-            <h2>Skia canvas</h2>
-            <span>CanvasKit preview</span>
+        <div class="viewport-grid">
+          <div class="viewport">
+            <div class="viewport-header">
+              <h2>Pixi canvas</h2>
+              <span>forceCanvas=true</span>
+            </div>
+            <div id="pixi-host" class="canvas-host"></div>
           </div>
-          <canvas id="skia-canvas" width="720" height="480"></canvas>
+
+          <div class="viewport">
+            <div class="viewport-header">
+              <h2>Skia canvas</h2>
+              <span>CanvasKit bridge</span>
+            </div>
+            <canvas id="skia-canvas" width="720" height="480"></canvas>
+          </div>
         </div>
       </section>
     </main>

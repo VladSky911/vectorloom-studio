@@ -18,8 +18,14 @@ const addShapeButtonElement =
   document.querySelector<HTMLButtonElement>("#add-shape-button");
 const exportPdfButtonElement =
   document.querySelector<HTMLButtonElement>("#export-pdf-button");
+const pdfBackendDotElement =
+  document.querySelector<HTMLSpanElement>("#pdf-backend-dot");
+const pdfBackendLabelElement =
+  document.querySelector<HTMLSpanElement>("#pdf-backend-label");
 
 if (
+  !pdfBackendDotElement ||
+  !pdfBackendLabelElement ||
   !pixiHostElement ||
   !skiaCanvasElement ||
   !statusTextElement ||
@@ -34,6 +40,8 @@ const skiaCanvas = skiaCanvasElement;
 const statusText = statusTextElement;
 const addShapeButton = addShapeButtonElement;
 const exportPdfButton = exportPdfButtonElement;
+const pdfBackendDot = pdfBackendDotElement;
+const pdfBackendLabel = pdfBackendLabelElement;
 
 const app = createPixiApp();
 pixiHost.appendChild(app.view);
@@ -74,6 +82,14 @@ async function boot(): Promise<void> {
   const sceneReader = new PixiSceneReader();
   const simplePdfExporter = new SimpleVectorPdfExporter();
   const skiaPdfExporter = new SkiaPdfExporter(CanvasKit);
+
+  if (skiaPdfExporter.isAvailable()) {
+    pdfBackendDot.classList.add("is-ready");
+    pdfBackendLabel.textContent = "Skia PDF backend ready";
+  } else {
+    pdfBackendDot.classList.add("is-fallback");
+    pdfBackendLabel.textContent = "Fallback vector PDF backend";
+  }
 
   exportPdfButton.disabled = false;
   exportPdfButton.addEventListener("click", () => {
