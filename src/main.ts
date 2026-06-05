@@ -4,6 +4,7 @@ import { createPixiApp } from "./pixi/createPixiApp";
 import { addRandomShape } from "./scene/addRandomShape";
 import { createInitialScene } from "./scene/createInitialScene";
 import { SkiaContainerRenderer } from "./skia/SkiaContainerRenderer";
+import { SkiaPointerBridge } from "./skia/SkiaPointerBridge";
 
 const pixiHostElement = document.querySelector<HTMLDivElement>("#pixi-host");
 const skiaCanvasElement =
@@ -51,6 +52,17 @@ async function boot(): Promise<void> {
   }
 
   const renderer = new SkiaContainerRenderer(CanvasKit, surface);
+
+  const pointerBridge = new SkiaPointerBridge(skiaCanvas, scene, {
+    onPointerDown: (object) => {
+      statusText.textContent = `Skia pointerDown on ${object.constructor.name}`;
+    },
+    onPointerUp: (object) => {
+      statusText.textContent = `Skia pointerUp on ${object.constructor.name}`;
+    },
+  });
+
+  pointerBridge.bind();
 
   renderSkiaPreview = () => {
     renderer.render(scene);

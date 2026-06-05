@@ -28,6 +28,8 @@ export function addRandomShape(scene: PIXI.Container): void {
   );
   graphic.rotation = Math.random() * Math.PI;
   graphic.scale.set(0.75 + Math.random() * 0.8);
+  graphic.eventMode = "static";
+  graphic.cursor = "pointer";
 
   scene.addChild(graphic);
 }
