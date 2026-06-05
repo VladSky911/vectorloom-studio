@@ -1,9 +1,9 @@
 import * as PIXI from "pixi.js-legacy";
 import { SCENE_HEIGHT, SCENE_WIDTH } from "../pixi/createPixiApp";
 
-export function createInitialScene(
+export async function createInitialScene(
   statusText: HTMLParagraphElement,
-): PIXI.Container {
+): Promise<PIXI.Container> {
   const scene = new PIXI.Container();
 
   const grid = new PIXI.Graphics();
@@ -51,6 +51,39 @@ export function createInitialScene(
   line.rotation = 0.25;
 
   scene.addChild(line);
+
+  const texture = PIXI.Texture.from("/assets/vectorloom-sprite.png");
+
+  await new Promise<void>((resolve) => {
+    if (texture.baseTexture.valid) {
+      resolve();
+      return;
+    }
+
+    texture.baseTexture.once("loaded", () => {
+      resolve();
+    });
+  });
+
+  const sprite = new PIXI.Sprite(texture);
+
+  sprite.position.set(545, 145);
+  sprite.anchor.set(0.5);
+  sprite.scale.set(1.25);
+  sprite.rotation = 0.18;
+  sprite.alpha = 0.92;
+  sprite.eventMode = "static";
+  sprite.cursor = "pointer";
+
+  sprite.on("pointerdown", () => {
+    statusText.textContent = "Pixi pointerDown on PNG sprite";
+  });
+
+  sprite.on("pointerup", () => {
+    statusText.textContent = "Pixi pointerUp on PNG sprite";
+  });
+
+  scene.addChild(sprite);
 
   return scene;
 }

@@ -30,14 +30,16 @@ const addShapeButton = addShapeButtonElement;
 const app = createPixiApp();
 pixiHost.appendChild(app.view);
 
-const scene = createInitialScene(statusText);
-app.stage.addChild(scene);
-
 let renderSkiaPreview = (): void => {
   statusText.textContent = "Skia renderer is still loading...";
 };
 
-async function bootSkia(): Promise<void> {
+async function boot(): Promise<void> {
+  statusText.textContent = "Loading Pixi scene and Skia renderer...";
+
+  const scene = await createInitialScene(statusText);
+  app.stage.addChild(scene);
+
   const CanvasKit = await CanvasKitInit({
     locateFile: (file) => `/canvaskit/${file}`,
   });
@@ -54,17 +56,19 @@ async function bootSkia(): Promise<void> {
     renderer.render(scene);
   };
 
+  addShapeButton.addEventListener("click", () => {
+    addRandomShape(scene);
+    renderSkiaPreview();
+    statusText.textContent = "Random shape added and rendered through Skia";
+  });
+
   renderSkiaPreview();
-  statusText.textContent = "Pixi container is rendered through Skia";
+  statusText.textContent =
+    "Pixi graphics and PNG sprite are rendered through Skia";
 }
 
-addShapeButton.addEventListener("click", () => {
-  addRandomShape(scene);
-  renderSkiaPreview();
-  statusText.textContent = "Random shape added and rendered through Skia";
-});
-
-bootSkia().catch((error: unknown) => {
+boot().catch((error: unknown) => {
   console.error(error);
-  statusText.textContent = "Skia failed to start. Check the browser console.";
+  statusText.textContent =
+    "Vectorloom Studio failed to start. Check the browser console.";
 });

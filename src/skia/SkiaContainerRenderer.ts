@@ -2,8 +2,11 @@ import type { CanvasKit, Paint, Surface } from "canvaskit-wasm";
 import * as PIXI from "pixi.js-legacy";
 
 type SkCanvas = ReturnType<Surface["getCanvas"]>;
+type SkImage = ReturnType<CanvasKit["MakeImageFromCanvasImageSource"]>;
 
 export class SkiaContainerRenderer {
+  private readonly imageCache = new WeakMap<PIXI.BaseTexture, SkImage>();
+
   constructor(
     private readonly CanvasKit: CanvasKit,
     private readonly surface: Surface,
@@ -28,6 +31,10 @@ export class SkiaContainerRenderer {
 
       if (child instanceof PIXI.Graphics) {
         this.renderGraphics(canvas, child);
+      }
+
+      if (child instanceof PIXI.Sprite) {
+        this.renderSprite(canvas, child);
       }
 
       if (child instanceof PIXI.Container) {
@@ -122,6 +129,73 @@ export class SkiaContainerRenderer {
       fillPaint?.delete();
       strokePaint?.delete();
     }
+  }
+
+  private renderSprite(canvas: SkCanvas, sprite: PIXI.Sprite): void {
+    const image = this.getSpriteImage(sprite);
+
+    if (!image) {
+      return;
+    }
+
+    const texture = sprite.texture;
+    const source = texture.frame;
+
+    const localWidth = sprite.width / sprite.scale.x;
+    const localHeight = sprite.height / sprite.scale.y;
+
+    const sourceRect = this.CanvasKit.XYWHRect(
+      source.x,
+      source.y,
+      source.width,
+      source.height,
+    );
+
+    const destinationRect = this.CanvasKit.XYWHRect(
+      -sprite.anchor.x * localWidth,
+      -sprite.anchor.y * localHeight,
+      localWidth,
+      localHeight,
+    );
+
+    const paint = new this.CanvasKit.Paint();
+    paint.setAntiAlias(true);
+    paint.setAlphaf(sprite.alpha);
+
+    canvas.drawImageRect(image, sourceRect, destinationRect, paint);
+
+    paint.delete();
+  }
+
+  private getSpriteImage(sprite: PIXI.Sprite): SkImage | null {
+    const baseTexture = sprite.texture.baseTexture;
+    const cachedImage = this.imageCache.get(baseTexture);
+
+    if (cachedImage) {
+      return cachedImage;
+    }
+
+    const resource = baseTexture.resource;
+
+    if (!resource || !("source" in resource)) {
+      return null;
+    }
+
+    const source = resource.source;
+
+    if (!(source instanceof HTMLImageElement)) {
+      return null;
+    }
+
+    const image = this.CanvasKit.MakeImageFromCanvasImageSource(source);
+
+    if (!image) {
+      return null;
+    }
+
+    this.imageCache.set(baseTexture, image);
+
+    return image;
   }
 
   private createFillPaint(data: PIXI.GraphicsData): Paint | null {
