@@ -7,6 +7,7 @@ import { addRandomShape } from "./scene/addRandomShape";
 import { createInitialScene } from "./scene/createInitialScene";
 import { SkiaContainerRenderer } from "./skia/SkiaContainerRenderer";
 import { SkiaPointerBridge } from "./skia/SkiaPointerBridge";
+import { SkiaPdfExporter } from "./export/SkiaPdfExporter";
 
 const pixiHostElement = document.querySelector<HTMLDivElement>("#pixi-host");
 const skiaCanvasElement =
@@ -71,12 +72,16 @@ async function boot(): Promise<void> {
   pointerBridge.bind();
 
   const sceneReader = new PixiSceneReader();
-  const pdfExporter = new SimpleVectorPdfExporter();
+  const simplePdfExporter = new SimpleVectorPdfExporter();
+  const skiaPdfExporter = new SkiaPdfExporter(CanvasKit);
 
   exportPdfButton.disabled = false;
   exportPdfButton.addEventListener("click", () => {
     const pdfScene = sceneReader.read(scene);
-    const pdfBlob = pdfExporter.export(pdfScene);
+    const pdfBlob = skiaPdfExporter.isAvailable()
+      ? skiaPdfExporter.export(pdfScene)
+      : simplePdfExporter.export(pdfScene);
+
     const url = URL.createObjectURL(pdfBlob);
 
     const link = document.createElement("a");
@@ -85,7 +90,10 @@ async function boot(): Promise<void> {
     link.click();
 
     URL.revokeObjectURL(url);
-    statusText.textContent = "Vector PDF exported from Pixi scene";
+
+    statusText.textContent = skiaPdfExporter.isAvailable()
+      ? "Vector PDF exported through Skia PDF backend"
+      : "Vector PDF exported through fallback backend";
   });
 
   renderSkiaPreview = () => {
