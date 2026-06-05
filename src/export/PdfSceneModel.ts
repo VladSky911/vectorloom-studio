@@ -12,8 +12,27 @@ export type PdfVectorShape = {
   strokeWidth: number;
 };
 
+export type PdfBitmapSprite = {
+  width: number;
+  height: number;
+  rgbHex: string;
+  alphaHex: string | null;
+  transform: {
+    a: number;
+    b: number;
+    c: number;
+    d: number;
+    e: number;
+    f: number;
+  };
+};
+
+export type PdfSceneItem =
+  | { type: "shape"; shape: PdfVectorShape }
+  | { type: "sprite"; sprite: PdfBitmapSprite };
+
 export type PdfSceneModel = {
   width: number;
   height: number;
-  shapes: PdfVectorShape[];
+  items: PdfSceneItem[];
 };

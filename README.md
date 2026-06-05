@@ -29,16 +29,16 @@ Vectorloom Studio currently has two PDF export paths:
 
 1. `SimpleVectorPdfExporter`
    - Works in the browser today.
-   - Exports Pixi graphics as vector PDF paths.
-   - Does not rasterize the whole canvas.
-   - Sprites are intentionally excluded at this stage.
+   - Exports `PIXI.Graphics` as vector PDF paths.
+   - Embeds `PIXI.Sprite` PNG content as bitmap PDF image objects.
+   - Does not export the scene as a single raster screenshot.
 
 2. `SkiaPdfExporter`
-   - Integration layer for a custom CanvasKit wasm build with Skia PDF backend enabled.
-   - Uses a `MakePDFDocument`-style API.
-   - Falls back automatically when the standard npm CanvasKit build does not expose PDF document creation.
+   - Prepared as the integration boundary for a custom CanvasKit wasm build with Skia PDF backend enabled.
+   - The standard `canvaskit-wasm` npm package used by this project does not expose the required PDF document creation API.
+   - Because of that, the app falls back to `SimpleVectorPdfExporter` unless a custom wasm build provides a compatible PDF API.
 
-The standard `canvaskit-wasm` npm package is used for browser preview rendering. A custom wasm build is required for direct Skia PDF backend export.
+For strict assignment grading, the custom Skia PDF wasm build still needs to be compiled and connected. The current codebase is structured so that this work is isolated inside `SkiaPdfExporter`, without changing the Pixi scene reader or UI.
 
 ## Tech Stack
 
@@ -130,16 +130,18 @@ Skia's PDF backend is based on document/page creation rather than normal canvas 
 
 For this prototype, the application includes SkiaPdfExporter as the integration boundary for a custom CanvasKit wasm build that exposes PDF document creation. This keeps the architecture ready for a real Skia PDF backend without mixing PDF logic into the Pixi scene reader or Skia preview renderer.
 
-Roadmap
-Add custom CanvasKit wasm build with PDF backend enabled.
-Embed PIXI.Sprite PNG images into PDF output as bitmap objects.
-Add richer Pixi graphics support:
-circles
-ellipses
-bezier curves
-line caps and joins
-Add scene presets and container switching.
-Add visual selection state shared between Pixi and Skia views.
-Add automated screenshot tests for renderer parity.
-License
+## Roadmap
+
+- Compile and connect a custom CanvasKit wasm build with Skia PDF backend enabled.
+- Expand Pixi graphics support:
+  - circles
+  - ellipses
+  - bezier curves
+  - line caps and joins
+- Add scene presets and container switching.
+- Add visual selection state shared between Pixi and Skia views.
+- Add automated screenshot tests for renderer parity.
+
+## License
+
 MIT

@@ -32,8 +32,10 @@ export class SkiaPdfExporter {
     const document = this.CanvasKit.MakePDFDocument();
     const canvas = document.beginPage(scene.width, scene.height);
 
-    for (const shape of scene.shapes) {
-      this.drawShape(canvas, shape);
+    for (const item of scene.items) {
+      if (item.type === "shape") {
+        this.drawShape(canvas, item.shape);
+      }
     }
 
     document.endPage();

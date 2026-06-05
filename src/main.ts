@@ -92,24 +92,34 @@ async function boot(): Promise<void> {
   }
 
   exportPdfButton.disabled = false;
-  exportPdfButton.addEventListener("click", () => {
-    const pdfScene = sceneReader.read(scene);
-    const pdfBlob = skiaPdfExporter.isAvailable()
-      ? skiaPdfExporter.export(pdfScene)
-      : simplePdfExporter.export(pdfScene);
+  exportPdfButton.addEventListener("click", async () => {
+    exportPdfButton.disabled = true;
+    statusText.textContent = "Preparing vector PDF export...";
 
-    const url = URL.createObjectURL(pdfBlob);
+    try {
+      const pdfScene = await sceneReader.read(scene);
+      const pdfBlob = skiaPdfExporter.isAvailable()
+        ? skiaPdfExporter.export(pdfScene)
+        : simplePdfExporter.export(pdfScene);
 
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = "vectorloom-scene.pdf";
-    link.click();
+      const url = URL.createObjectURL(pdfBlob);
 
-    URL.revokeObjectURL(url);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "vectorloom-scene.pdf";
+      link.click();
 
-    statusText.textContent = skiaPdfExporter.isAvailable()
-      ? "Vector PDF exported through Skia PDF backend"
-      : "Vector PDF exported through fallback backend";
+      URL.revokeObjectURL(url);
+
+      statusText.textContent = skiaPdfExporter.isAvailable()
+        ? "Vector PDF exported through Skia PDF backend"
+        : "Vector PDF exported with vector graphics and bitmap sprites";
+    } catch (error) {
+      console.error(error);
+      statusText.textContent = "PDF export failed. Check the browser console.";
+    } finally {
+      exportPdfButton.disabled = false;
+    }
   });
 
   renderSkiaPreview = () => {
