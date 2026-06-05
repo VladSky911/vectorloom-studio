@@ -145,3 +145,9 @@ For this prototype, the application includes SkiaPdfExporter as the integration 
 ## License
 
 MIT
+
+## Assignment Status
+
+The application implements Pixi-to-Skia rendering, interaction on both canvases, vector PDF export with bitmap sprites, and includes the source/integration boundary for a Skia PDF wasm backend.
+
+The custom Skia wasm backend source was prepared and documented in `native/skia-pdf-backend`, but the browser build currently falls back to a vector PDF writer unless custom Skia PDF wasm artifacts are provided.
