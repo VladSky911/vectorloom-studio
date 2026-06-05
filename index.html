@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vectorloom Studio</title>
+  </head>
+  <body>
+    <main class="app-shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <span class="brand-mark"></span>
+          <div>
+            <h1>Vectorloom Studio</h1>
+            <p>Pixi scene. Skia render. Vector PDF export.</p>
+          </div>
+        </div>
+
+        <section class="panel">
+          <h2>Controls</h2>
+          <button id="add-shape-button" type="button">Generate shape</button>
+          <button id="export-pdf-button" type="button" disabled>
+            Export PDF
+          </button>
+        </section>
+
+        <section class="panel">
+          <h2>Status</h2>
+          <p id="status-text">Starting renderer...</p>
+        </section>
+      </aside>
+
+      <section class="workspace">
+        <div class="viewport">
+          <div class="viewport-header">
+            <h2>Pixi canvas</h2>
+            <span>forceCanvas=true</span>
+          </div>
+          <div id="pixi-host" class="canvas-host"></div>
+        </div>
+
+        <div class="viewport">
+          <div class="viewport-header">
+            <h2>Skia canvas</h2>
+            <span>CanvasKit preview</span>
+          </div>
+          <canvas id="skia-canvas" width="720" height="480"></canvas>
+        </div>
+      </section>
+    </main>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
