@@ -4,6 +4,8 @@ Vectorloom Studio is a TypeScript prototype that bridges PixiJS scene compositio
 
 The project is built as a working graphics tool prototype rather than a static demo: PixiJS owns the interactive scene graph, Skia renders the Pixi container into a second canvas, and the export layer converts Pixi graphics into vector PDF commands.
 
+**[Live Demo →](https://vectorloom-studio.vercel.app/)**
+
 ## What It Does
 
 - Creates a PixiJS canvas application with `forceCanvas: true`.
